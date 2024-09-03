@@ -33,6 +33,7 @@ a {
 }
 
 /* Navbar */
+/* Base Navbar Styling */
 .navbar {
     background-color: #333;
     padding: 10px 0;
@@ -49,29 +50,48 @@ a {
     align-items: center;
 }
 
+/* Logo Styling */
 .navbar .logo {
     color: #ffcc00;
     font-size: 24px;
     font-weight: 600;
+    text-decoration: none;
 }
 
-.navbar .nav-menu {
-    list-style: none;
+/* Default Hidden Hamburger and Nav for Larger Screens */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 25px;
+    height: 20px;
+    cursor: pointer;
+    z-index: 150;
+}
+
+.hamburger .bar {
+    width: 100%;
+    height: 3px;
+    background-color: white;
+    transition: all 0.3s ease;
+}
+
+/* Nav Menu for Large Screens */
+.nav-menu {
     display: flex;
+    list-style: none;
 }
 
-.navbar .nav-menu li {
+.nav-menu li {
     margin-left: 20px;
 }
 
-.navbar .nav-menu li a {
-    color: #fff;
+.nav-menu li a {
+    color: white;
+    text-decoration: none;
     font-size: 16px;
     font-weight: 500;
-}
-
-.navbar .nav-menu li a:hover {
-    color: #ffcc00;
+    transition: color 0.3s ease;
 }
 
 .theme-toggle {
@@ -404,19 +424,333 @@ body.dark-theme .btn-primary:hover {
     color: #ffcc00;
 }
 
+/* Hide Nav Menu in Small Screens */
+@media (max-width: 1080px) {
+    /* Hamburger is Visible in Small Screens */
+    .hamburger {
+        display: flex;
+    }
+
+    .nav-menu {
+        display: none; /* Hide the navigation initially */
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background-color: #333;
+        flex-direction: column;
+        align-items: center;
+        z-index: 100;
+    }
+
+    .nav-menu li {
+        margin: 20px 0;
+    }
+
+    .nav-menu.active {
+        display: flex; /* Show the nav menu when hamburger is clicked */
+    }
+
+    /* Hamburger Menu Turns into a Cross */
+    .hamburger.open .bar:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .hamburger.open .bar:nth-child(2) {
+        opacity: 0; /* Hide the middle bar */
+    }
+
+    .hamburger.open .bar:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -5px);
+    }
+}
+
 /* Media Queries for responsiveness */
 @media (max-width: 768px) {
+    /* General Layout */
+    body {
+        padding: 0 15px;
+    }
+
+    .container {
+        padding: 0 10px;
+    }
+
+    /* Navbar */
+    .navbar .container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar .nav-menu {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 15px;
+    }
+
+    .navbar .nav-menu li {
+        margin: 5px 0;
+    }
+
+    .navbar .nav-menu li a {
+        font-size: 14px;
+    }
+
+    /* Hero Section */
+    #hero {
+        height: 80vh;
+        padding-top: 30px;
+    }
+
+    .hero-title {
+        font-size: 36px;
+    }
+
+    .hero-subtitle {
+        font-size: 18px;
+    }
+
+    .btn-primary {
+        font-size: 16px;
+        padding: 8px 15px;
+    }
+
+    /* About Section */
     .about-container {
         flex-direction: column;
         text-align: center;
     }
 
     .about-content {
-        margin: 0;
         margin-bottom: 30px;
     }
 
-    .projects-grid, .skills-grid {
+    .about-image img {
+        width: 200px;
+    }
+
+    /* Projects Section */
+    .projects-grid {
         grid-template-columns: 1fr;
+    }
+
+    .project-card {
+        margin-bottom: 20px;
+    }
+
+    /* Skills Section */
+    .skills-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .skill-card {
+        margin-bottom: 20px;
+    }
+
+    /* Achievements Section */
+    .achievements-list li {
+        font-size: 16px;
+    }
+
+    /* Contact Section */
+    .contact-container p, .contact-container a {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* General Layout */
+    .container {
+        padding: 0 15px;
+    }
+
+    /* Navbar */
+    .navbar .nav-menu {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .navbar .nav-menu li a {
+        font-size: 16px;
+    }
+
+    /* Hero Section */
+    #hero {
+        height: 90vh;
+    }
+
+    .hero-title {
+        font-size: 42px;
+    }
+
+    .hero-subtitle {
+        font-size: 20px;
+    }
+
+    .btn-primary {
+        font-size: 18px;
+        padding: 10px 20px;
+    }
+
+    /* About Section */
+    .about-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .about-content {
+        margin-bottom: 30px;
+    }
+
+    .about-image img {
+        width: 250px;
+    }
+
+    /* Projects Section */
+    .projects-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* Skills Section */
+    .skills-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* Achievements Section */
+    .achievements-list li {
+        font-size: 18px;
+    }
+
+    /* Contact Section */
+    .contact-container p, .contact-container a {
+        font-size: 18px;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1440px) {
+    /* General Layout */
+    .container {
+        padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar .nav-menu li a {
+        font-size: 18px;
+    }
+
+    /* Hero Section */
+    #hero {
+        height: 100vh;
+    }
+
+    .hero-title {
+        font-size: 50px;
+    }
+
+    .hero-subtitle {
+        font-size: 24px;
+    }
+
+    .btn-primary {
+        font-size: 20px;
+        padding: 12px 25px;
+    }
+
+    /* About Section */
+    .about-container {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .about-content {
+        margin-right: 50px;
+    }
+
+    .about-image img {
+        width: 300px;
+    }
+
+    /* Projects Section */
+    .projects-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Skills Section */
+    .skills-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Achievements Section */
+    .achievements-list li {
+        font-size: 20px;
+    }
+
+    /* Contact Section */
+    .contact-container p, .contact-container a {
+        font-size: 20px;
+    }
+}
+
+@media (min-width: 1440px) {
+    /* General Layout */
+    .container {
+        padding: 0 30px;
+    }
+
+    /* Navbar */
+    .navbar .nav-menu li a {
+        font-size: 20px;
+    }
+
+    /* Hero Section */
+    #hero {
+        height: 100vh;
+    }
+
+    .hero-title {
+        font-size: 60px;
+    }
+
+    .hero-subtitle {
+        font-size: 28px;
+    }
+
+    .btn-primary {
+        font-size: 22px;
+        padding: 14px 30px;
+    }
+
+    /* About Section */
+    .about-container {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .about-content {
+        margin-right: 50px;
+    }
+
+    .about-image img {
+        width: 350px;
+    }
+
+    /* Projects Section */
+    .projects-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Skills Section */
+    .skills-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Achievements Section */
+    .achievements-list li {
+        font-size: 22px;
+    }
+
+    /* Contact Section */
+    .contact-container p, .contact-container a {
+        font-size: 22px;
     }
 }
