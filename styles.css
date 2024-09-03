@@ -380,6 +380,14 @@ body.dark-theme .skill-card {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
+body.dark-theme .skill-card h3 {
+    color: white;
+}
+
+body.dark-theme .skill-card p {
+    color: rgb(195, 195, 195);
+}
+
 body.dark-theme .skill-card:hover {
     background-color: #333;
 }
