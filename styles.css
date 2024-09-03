@@ -395,6 +395,9 @@ body.dark-theme .skill-card:hover {
 /* Achievements Section */
 body.dark-theme .achievements-list {
     background-color: #1f1f1f;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 1px 2px #3b3636;
 }
 
 body.dark-theme .achievements-list li {
