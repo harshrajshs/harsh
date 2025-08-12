@@ -403,6 +403,49 @@ body.dark-theme .achievements-list {
 body.dark-theme .achievements-list li {
     color: #e0e0e0;
 }
+/* chatbot section */
+/* Chatbot Section Styling */
+.chatbot-section {
+    background: var(--bg-color, #f8f9fa);
+    padding: 60px 20px;
+}
+
+.chatbot-section .section-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+/* Chatbot Container */
+.chatbot-container {
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    border: 1px solid rgba(0,0,0,0.1);
+    background-color: #fff;
+}
+
+/* iframe Styling */
+.chatbot-container iframe {
+    width: 100%;
+    height: 600px;
+    border: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .chatbot-container iframe {
+        height: 500px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chatbot-container iframe {
+        height: 400px;
+    }
+}
 
 /* Contact Section */
 body.dark-theme .contact-container {
