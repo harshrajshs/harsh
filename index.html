@@ -3,153 +3,672 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harsh Raj | Web Developer & AI Specialist</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Harsh Raj - Data Scientist & AI Engineer</title>
+    <!-- Chosen Palette: "Tech Neutrals" - A clean, modern palette using light gray, deep slate, and a vibrant, professional blue accent to create a high-tech and polished aesthetic. -->
+    <!-- Application Structure Plan: A single-page, scrolling narrative structure was chosen to guide users through Harsh Raj's professional story seamlessly. The flow is: 1. Immersive 3D Hero section to grab attention. 2. A concise "About Me" section. 3. An interactive "Skills" radar chart. 4. A tabbed "Experience & Projects" section to logically separate content. 5. A "Certifications & Achievements" section. 6. A final "Contact" section. This structure is engaging and highlights key qualifications effectively. -->
+    <!-- Visualization & Content Choices:
+        - Report Info: Name/Title -> Goal: Introduction -> Viz/Method: 3D Particle Field (Three.js) -> Interaction: Mouse movement rotates the scene -> Justification: Creates a memorable, "data-centric" visual that is more advanced than a single object.
+        - Report Info: Technical Skills -> Goal: Showcase proficiency -> Viz/Method: Radar Chart (Chart.js) -> Interaction: Hovering -> Justification: A quick, visually compelling summary of diverse technical abilities.
+        - Report Info: Work Experience & Projects -> Goal: Organize work -> Viz/Method: Animated Tabbed Content (HTML/CSS/JS) -> Interaction: Clicking tabs fades/slides content -> Justification: Prevents content overload and adds a fluid micro-interaction.
+        - Report Info: General Content -> Goal: Inform -> Viz/Method: Styled Text Blocks (HTML/Tailwind) -> Interaction: Scroll-based fade-in animations -> Justification: Enhances readability and makes the page feel dynamic.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="container">
-            <a href="#" class="logo">Harsh Raj</a>
-            <!-- Hamburger Icon -->
-            <div class="hamburger" id="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-            <!-- Navigation Menu -->
-            <ul class="nav-menu" id="nav-menu">
-                <li><a href="#about">About</a></li>
-                <li><a href="#projects">Projects</a></li>
-                <li><a href="#skills">Skills</a></li>
-                <li><a href="#achievements">Achievements</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><button id="theme-toggle" class="theme-toggle"><i class="fas fa-adjust"></i></button></li>
-            </ul>
-        </div>
-    </nav>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa; /* Lighter, cleaner gray */
+            color: #2d3748; /* Darker slate for better contrast */
+            overflow-x: hidden;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
 
-    <!-- Hero Section -->
-    <header id="hero">
-        <div class="container hero-container">
-            <h1 class="hero-title">Hi, I'm <span>Harsh Raj</span></h1>
-            <p class="hero-subtitle">Web Developer | AI Enthusiast | Data Scientist</p>
-            <a href="#projects" class="btn-primary">See My Work</a>
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: linear-gradient(180deg, rgba(248, 249, 250, 0) 0%, #f8f9fa 100%);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Text Gradient Animation */
+        .text-gradient-animate {
+            background: linear-gradient(90deg, #3b82f6, #6366f1, #3b82f6);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-flow 4s ease infinite;
+        }
+        
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Animated Scroll Down Indicator */
+        .scroll-down-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 24px;
+            height: 40px;
+            border: 2px solid #a0aec0;
+            border-radius: 12px;
+            opacity: 0.7;
+        }
+        .scroll-down-indicator::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 8px;
+            background: #a0aec0;
+            border-radius: 2px;
+            animation: scroll-anim 2s infinite;
+        }
+        @keyframes scroll-anim {
+            0% { transform: translate(-50%, 0); opacity: 1; }
+            50% { transform: translate(-50%, 10px); opacity: 0.5; }
+            100% { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        /* Section Fade-in Animation */
+        .section-fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .section-fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Tab Button Styling */
+        .tab-btn {
+            position: relative;
+            transition: all 0.3s ease;
+            color: #718096; /* Inactive color */
+        }
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: #3b82f6; /* Active blue */
+            transform: scaleX(0);
+            transition: transform 0.3s ease-out;
+        }
+        .tab-btn.active {
+            color: #3b82f6; /* Active color */
+        }
+        .tab-btn.active::after {
+            transform: scaleX(1);
+        }
+        
+        /* Tab Content Animation */
+        .tab-content {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+            display: none;
+        }
+        .tab-content.active {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+
+        /* Advanced Card Styling */
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background: linear-gradient(120deg, #3b82f6, #6366f1) border-box;
+            -webkit-mask:
+                linear-gradient(#fff 0 0) padding-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.07);
+        }
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 550px;
+            margin: auto;
+            height: 320px; /* Responsive height */
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold tracking-wider text-slate-900">Harsh Raj</div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#home" data-section="home" class="nav-link text-slate-600 hover:text-blue-600 transition">Home</a>
+                <a href="#about" data-section="about" class="nav-link text-slate-600 hover:text-blue-600 transition">About</a>
+                <a href="#skills" data-section="skills" class="nav-link text-slate-600 hover:text-blue-600 transition">Skills</a>
+                <a href="#experience-projects" data-section="experience-projects" class="nav-link text-slate-600 hover:text-blue-600 transition">Work</a>
+                <a href="#contact" data-section="contact" class="nav-link text-slate-600 hover:text-blue-600 transition">Contact</a>
+            </nav>
         </div>
     </header>
 
-    <!-- About Section -->
-    <section id="about" class="section about-section">
-        <div class="container about-container">
-            <div class="about-content">
-                <h2 class="section-title">About Me</h2>
-                <p>
-                    I am a B.Tech student at IIT Guwahati, specializing in <b><strong>Data Science and Artificial Intelligence</strong></b>. I have a deep passion for web development, AI, and data-driven applications. My goal is to create seamless digital experiences that combine aesthetic design with technical excellence.
+    <main>
+        <section id="home" class="relative h-screen flex items-center justify-center text-center overflow-hidden">
+            <canvas id="hero-canvas"></canvas>
+            <div class="hero-content max-w-3xl px-4">
+                <h1 class="text-5xl md:text-7xl font-bold text-slate-900 mb-4 tracking-tight">
+                    <span class="text-gradient-animate">Harsh Raj</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-slate-700 font-light">Data Scientist & AI Engineer</p>
+                <p class="mt-4 text-slate-600 max-w-xl mx-auto">
+                    Transforming complex data into intelligent solutions. Specializing in Python, Azure, and Big Data to build scalable AI systems and drive real-time analytics.
                 </p>
+                <a href="#about" class="mt-8 inline-block bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition-all transform hover:scale-105 duration-300">
+                    Explore My Work
+                </a>
             </div>
-            <div class="about-image">
-                <img src="images/profile-photo.png" alt="Harsh Raj Profile Photo">
-            </div>
-        </div>
-    </section>
+            <div class="scroll-down-indicator"></div>
+        </section>
 
-    <!-- Projects Section -->
-    <section id="projects" class="section projects-section">
-        <div class="container">
-            <h2 class="section-title">Projects</h2>
-            <div class="projects-grid">
-                <div class="project-card">
-                    <h3>Graph Neural Network</h3>
-                    <p>K-Means clustering, PCA, dimensionality reduction (LLE, t-SNE) using GNNs for classification.</p>
+        <section id="about" class="py-20 lg:py-32 section-fade-in">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-slate-900">About Me</h2>
+                    <p class="text-slate-600 mt-2 text-lg">My professional journey and education.</p>
                 </div>
-                <div class="project-card">
-                    <h3>Improving Image Captioning</h3>
-                    <p>Implemented encoder block using CLIP model and PyTorch for structured concept prediction in image captioning.</p>
-                </div>
-                <div class="project-card">
-                    <h3>Smart Plant Monitoring System</h3>
-                    <p>Developed a plant health monitoring system using ESP32 and AI models for automated plant diagnostics.</p>
-                </div>
-                <div class="project-card">
-                    <h3>Your IIT Counselling Helper</h3>
-                    <p>Built a data-driven tool using Python, JavaScript, and PHP to assist in IIT counselling.</p>
-                </div>
-                <div class="project-card">
-                    <h3>Srijan Home School</h3>
-                    <p>Full-stack web app for school management built with React, Node.js, and MongoDB.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Skills Section -->
-    <section id="skills" class="section skills-section">
-        <div class="container">
-            <h2 class="section-title">Technical Skills</h2>
-            <div class="skills-grid">
-                <div class="skill-card">
-                    <h3>Programming</h3>
-                    <p>Python, C/C++, PHP, R</p>
-                </div>
-                <div class="skill-card">
-                    <h3>Web Development</h3>
-                    <p>HTML, CSS, JavaScript, React, Node.js</p>
-                </div>
-                <div class="skill-card">
-                    <h3>Frameworks</h3>
-                    <p>PyTorch, TensorFlow</p>
-                </div>
-                <div class="skill-card">
-                    <h3>Database Management</h3>
-                    <p>SQL, MongoDB</p>
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-2/3 text-lg text-slate-700 leading-relaxed space-y-4">
+                        <p>
+                            I am a passionate Data Scientist and AI Engineer with a Bachelor's degree in Data Science and Artificial Intelligence from IIT Guwahati. My expertise lies in developing scalable AI solutions, creating intelligent automation workflows, and integrating AI-driven data pipelines into production systems to enhance decision-making.
+                        </p>
+                        <p>
+                           With hands-on experience at Verdantas and a mentoring role at Learn Hill Technologies, I have honed my skills in Python, Azure, and various machine learning frameworks. I am driven by the challenge of solving complex problems and am always eager to learn and apply new technologies to create impactful, data-driven products.
+                        </p>
+                    </div>
+                     <div class="md:w-1/3 p-6 card">
+                        <h3 class="font-bold text-xl mb-4 text-slate-900">Education</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-semibold text-slate-800">IIT Guwahati</h4>
+                                <p class="text-sm text-slate-600">B.Tech, Data Science & AI (2021-2025)</p>
+                                <p class="text-sm text-slate-500">GPA: 7.35/10</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-slate-800">Plus Two High School Kurtha</h4>
+                                <p class="text-sm text-slate-600">Senior Secondary (2020-2021)</p>
+                                <p class="text-sm text-slate-500">GPA: 8.62/10</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Achievements Section -->
-    <section id="achievements" class="section achievements-section">
-        <div class="container">
-            <h2 class="section-title">Achievements</h2>
-            <ul class="achievements-list">
-                <li>Regional Mathematical Olympiad (RMO) Qualified, 2018</li>
-                <li>Ranked <b>2549</b> in JEE Advanced (2021)</li>
-                <li>Codeforces Highest Rating: 1416</li>
-                <li>Shortlisted in IOQP Part-2, 2020-2021</li>
-                <li><b>State Topper</b> in IOQP Part-1, 2020-2021</li>
-            </ul>
-        </div>
-    </section>
-    <section id="chatbot" class="section chatbot-section">
-        <div class="container">
-            <h2 class="section-title">Chat with Me</h2>
-            <div class="chatbot-container">
-                <iframe 
-                    src="https://copilotstudio.microsoft.com/environments/Default-694b700c-7f7a-4dd6-8d36-04e90dfc0d02/bots/cr037_agentLmYcFI/webchat?__version__=2" 
-                    frameborder="0"
-                    allow="microphone"
-                    title="Chatbot"
-                ></iframe>
+        <section id="skills" class="py-20 lg:py-32 bg-white section-fade-in">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-slate-900">Technical Skills</h2>
+                    <p class="text-slate-600 mt-2 text-lg">A visual representation of my core competencies.</p>
+                </div>
+                <div class="flex flex-col lg:flex-row items-center justify-center gap-12">
+                    <div class="lg:w-1/2">
+                       <div class="chart-container">
+                            <canvas id="skillsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 grid grid-cols-2 gap-x-8 gap-y-6">
+                        <div>
+                            <h3 class="text-xl font-semibold text-slate-800 mb-2">Languages</h3>
+                            <ul class="list-disc list-inside text-slate-700">
+                                <li>Python</li>
+                                <li>C/C++</li>
+                                <li>R</li>
+                                <li>SQL</li>
+                                <li>HTML/CSS/JS</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-slate-800 mb-2">Frameworks & Libraries</h3>
+                            <ul class="list-disc list-inside text-slate-700">
+                                <li>PyTorch, TensorFlow</li>
+                                <li>React</li>
+                                <li>Scikit-learn</li>
+                                <li>NumPy, Pandas, Matplotlib</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-slate-800 mb-2">Databases</h3>
+                             <ul class="list-disc list-inside text-slate-700">
+                                <li>MySQL</li>
+                                <li>MongoDB</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-slate-800 mb-2">Tools & Cloud</h3>
+                            <ul class="list-disc list-inside text-slate-700">
+                                <li>Microsoft Azure</li>
+                                <li>Power Apps, Power Automate</li>
+                                <li>Git, Spark</li>
+                                <li>Jupyter, VS Code</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-slate-800 mb-2">Domains</h3>
+                            <ul class="list-disc list-inside text-slate-700">
+                                <li>Artificial Intelligence</li>
+                                <li>Machine Learning</li>
+                                <li>Deep Learning</li>
+                                <li>Data Science</li>
+                                <li>Data Analytics</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="section contact-section">
-        <div class="container">
-            <h2 class="section-title">Contact Me</h2>
-            <p>You can reach me at: <a href="mailto:harsh.raj@iitg.ac.in">harsh.raj@iitg.ac.in</a></p>
-            <p>Find me on: 
-                <a href="https://github.com/harshrajshs" target="_blank">GitHub</a> |
-                <a href="https://www.linkedin.com/in/harsh-raj-13b100241/" target="_blank">LinkedIn</a>
-            </p>
-        </div>
-    </section>
+        <section id="experience-projects" class="py-20 lg:py-32 section-fade-in">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold text-slate-900">Experience & Projects</h2>
+                    <p class="text-slate-600 mt-2 text-lg">Explore my professional and personal work.</p>
+                </div>
 
-    <script src="script.js"></script>
+                <div class="flex justify-center mb-10 border-b border-slate-200">
+                    <button class="tab-btn active text-lg font-medium px-6 py-3" data-tab="experience">Experience</button>
+                    <button class="tab-btn text-lg font-medium px-6 py-3" data-tab="projects">Projects</button>
+                </div>
+
+                <div class="relative max-w-4xl mx-auto">
+                    <div id="experience" class="tab-content active">
+                        <div class="grid md:grid-cols-1 gap-8">
+                            <div class="card p-6">
+                                <h3 class="text-xl font-bold text-slate-900">Verdantas</h3>
+                                <p class="text-md font-semibold text-blue-600 mb-2">Data Scientist (Full-time)</p>
+                                <p class="text-sm text-slate-500 mb-4">Pune, Maharashtra | Aug 2025 – Present</p>
+                                <ul class="list-disc list-inside text-slate-700 space-y-2">
+                                    <li>Develop scalable AI solutions leveraging Python, Azure, and Big Data for real-time analytics.</li>
+                                    <li>Built intelligent automation workflows using Microsoft Power Apps and Power Automate.</li>
+                                    <li>Improved decision-making efficiency by integrating AI-driven data pipelines into production systems.</li>
+                                </ul>
+                            </div>
+                            <div class="card p-6">
+                                <h3 class="text-xl font-bold text-slate-900">Learn Hill Technologies</h3>
+                                <p class="text-md font-semibold text-blue-600 mb-2">Student Mentor (Internship)</p>
+                                <p class="text-sm text-slate-500 mb-4">Tinsukia, Assam | May 2024</p>
+                                <ul class="list-disc list-inside text-slate-700 space-y-2">
+                                    <li>Implemented the Tinkering Lab project under Samagra Shiksha Assam, Govt. of Assam.</li>
+                                    <li>Trained students and teachers on IoT, Machine Learning, AI, and electronics.</li>
+                                    <li>Guided practical sessions with Arduino-based hands-on experiments to promote STEM learning.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="projects" class="tab-content">
+                        <div class="grid md:grid-cols-1 gap-8">
+                            <div class="card p-6">
+                                <h3 class="text-xl font-bold text-slate-900">AI-Powered Agricultural Assistant</h3>
+                                <p class="text-md font-semibold text-slate-700 mb-2">AI & Machine Learning</p>
+                                <ul class="list-disc list-inside text-slate-700 space-y-2">
+                                    <li>Engineered an AI-driven tool for agricultural disease detection and provided tailored advice.</li>
+                                    <li>Employed CNNs for image classification and utilized GPT for generating user-friendly alerts.</li>
+                                    <li>Automated recommendation delivery to clients via SMTP with 92% accuracy in disease detection.</li>
+                                </ul>
+                            </div>
+                            <div class="card p-6">
+                                <h3 class="text-xl font-bold text-slate-900">Your IIT Counselling Helper</h3>
+                                <p class="text-md font-semibold text-slate-700 mb-2">Full-Stack Development & Data Visualization</p>
+                                <ul class="list-disc list-inside text-slate-700 space-y-2">
+                                    <li>Created a data-driven counseling tool recommending IIT colleges/branches based on rank analysis.</li>
+                                    <li>Processed JoSAA data with Python and visualized insights using Chart.js for better clarity.</li>
+                                    <li>Developed a full-stack interface with HTML, CSS, JS, PHP, and MySQL backend.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="certifications" class="py-20 lg:py-32 bg-white section-fade-in">
+             <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-slate-900">Credentials</h2>
+                    <p class="text-slate-600 mt-2 text-lg">My key certifications and achievements.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-slate-800 mb-6">Certifications</h3>
+                        <div class="space-y-4">
+                             <div class="card p-4">
+                                <p class="font-semibold text-slate-800">Microsoft Azure AI Essentials</p>
+                                <p class="text-sm text-slate-500">Microsoft & LinkedIn - Oct 2025</p>
+                            </div>
+                            <div class="card p-4">
+                                <p class="font-semibold text-slate-800">Generative AI for Everyone</p>
+                                <p class="text-sm text-slate-500">Coursera - Jun 2025</p>
+                            </div>
+                             <div class="card p-4">
+                                <p class="font-semibold text-slate-800">Introduction to Computer Vision</p>
+                                <p class="text-sm text-slate-500">Coursera - Feb 2024</p>
+                            </div>
+                            <div class="card p-4">
+                                <p class="font-semibold text-slate-800">Neural Networks & Deep Learning</p>
+                                <p class="text-sm text-slate-500">Coursera - Jan 2024</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-slate-800 mb-6">Achievements</h3>
+                        <div class="space-y-4">
+                             <div class="card p-4">
+                                <p class="font-semibold text-slate-800">JEE Advanced Rank: 2549 / 2.5 Lakh</p>
+                                <p class="text-sm text-slate-500">2021</p>
+                            </div>
+                             <div class="card p-4">
+                                <p class="font-semibold text-slate-800">Regional Mathematical Olympiad (RMO)</p>
+                                <p class="text-sm text-slate-500">Qualified - 2018</p>
+                            </div>
+                            <div class="card p-4">
+                                <p class="font-semibold text-slate-800">IOQP Part-2 Shortlisted (Top 347)</p>
+                                <p class="text-sm text-slate-500">2020-2021</p>
+                            </div>
+                             <div class="card p-4">
+                                <p class="font-semibold text-slate-800">Codeforces Highest Rating: 1416</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer id="contact" class="bg-slate-900 text-white py-20 section-fade-in">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold mb-4">Get In Touch</h2>
+                <p class="text-slate-300 mb-8 max-w-xl mx-auto">I'm currently seeking new opportunities and would love to hear from you. Whether you have a question or just want to connect, feel free to reach out.</p>
+                <div class="flex justify-center items-center flex-wrap gap-x-8 gap-y-4 text-lg">
+                    <a href="mailto:harshiitg2025@gmail.com" class="hover:text-blue-400 transition">harshiitg2025@gmail.com</a>
+                    <span class="text-slate-500 hidden md:block">|</span>
+                    <p class="text-slate-300">+91 74800 34563</p>
+                    <span class="text-slate-500 hidden md:block">|</span>
+                    <a href="https://www.linkedin.com/in/maharshi7" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition">LinkedIn</a>
+                    <span class="text-slate-500 hidden md:block">|</span>
+                    <a href="https://github.com/harshrajshs" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition">GitHub</a>
+                </div>
+                <p class="mt-12 text-slate-500 text-sm">© 2025 Harsh Raj. Designed with passion.</p>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({
+                canvas: document.querySelector('#hero-canvas'),
+                alpha: true
+            });
+
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.position.setZ(30);
+            
+            const particlesGroup = new THREE.Group();
+            scene.add(particlesGroup);
+
+            const particleGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+            const particleMaterial = new THREE.MeshStandardMaterial({
+                color: 0x3b82f6,
+                metalness: 0.3,
+                roughness: 0.4
+            });
+
+            const particles = [];
+            for (let i = 0; i < 300; i++) {
+                const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+                particle.position.set(
+                    (Math.random() - 0.5) * 50,
+                    (Math.random() - 0.5) * 50,
+                    (Math.random() - 0.5) * 50
+                );
+                particle.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                particles.push(particle);
+                particlesGroup.add(particle);
+            }
+
+            const pointLight = new THREE.PointLight(0xffffff, 1.2);
+            pointLight.position.set(10, 10, 10);
+            scene.add(pointLight);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            let mouseX = 0;
+            let mouseY = 0;
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                particlesGroup.rotation.y += 0.0005;
+                particlesGroup.rotation.x += 0.0002;
+                
+                if (mouseX && mouseY) {
+                    camera.position.x += (mouseX * 5 - camera.position.x) * 0.02;
+                    camera.position.y += (mouseY * 5 - camera.position.y) * 0.02;
+                    camera.lookAt(scene.position);
+                }
+                renderer.render(scene, camera);
+            }
+            animate();
+            
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            const navbar = document.getElementById('navbar');
+            let lastScrollY = window.scrollY;
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('bg-white/90', 'backdrop-blur-lg', 'shadow-md');
+                } else {
+                    navbar.classList.remove('bg-white/90', 'backdrop-blur-lg', 'shadow-md');
+                }
+
+                if (window.scrollY > lastScrollY && window.scrollY > 200) {
+                    navbar.classList.add('-translate-y-full');
+                } else {
+                    navbar.classList.remove('-translate-y-full');
+                }
+                lastScrollY = window.scrollY;
+            });
+
+            const sections = document.querySelectorAll('.section-fade-in');
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            sections.forEach(section => {
+                sectionObserver.observe(section);
+            });
+            
+            const skillsChartCtx = document.getElementById('skillsChart').getContext('2d');
+            const skillsChart = new Chart(skillsChartCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Python', 'Machine Learning', 'Big Data', 'Cloud (Azure)', 'SQL', 'Deep Learning', 'Data Viz'],
+                    datasets: [{
+                        label: 'Proficiency',
+                        data: [90, 85, 80, 85, 75, 80, 90],
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(59, 130, 246, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                           display: false
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.05)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                            pointLabels: { 
+                                font: { size: 14 },
+                                color: '#374151'
+                            },
+                            ticks: {
+                                backdropColor: 'transparent',
+                                color: '#6b7280',
+                                stepSize: 20
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    }
+                }
+            });
+
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab;
+                    
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mainSections = document.querySelectorAll('main > section, footer');
+
+            const navObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.toggle('text-blue-600', link.getAttribute('data-section') === id);
+                            link.classList.toggle('font-semibold', link.getAttribute('data-section') === id);
+                            link.classList.toggle('text-slate-600', link.getAttribute('data-section') !== id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-30% 0px -70% 0px', threshold: 0 });
+
+            mainSections.forEach(section => {
+                if (section.id) {
+                    navObserver.observe(section);
+                }
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if(targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+        });
+    </script>
 </body>
 </html>
+
+
