@@ -1036,6 +1036,15 @@
 
       const isMobile = W < 900; // matches the CSS layout breakpoint
       const isTiny = W < 480;
+
+      // Below the two-column breakpoint the portrait sits directly above the
+      // text (order:-1) with little vertical room — the orbiting node diagram
+      // has nowhere safe to go without colliding with the copy underneath, so
+      // we skip it entirely there and keep just the static dashed ring.
+      if (isMobile){
+        return;
+      }
+
       const prect = portrait.getBoundingClientRect();
       // Always anchor on the photo's real on-screen position, whatever the current layout is
       const cx = prect.left + prect.width / 2 - rect.left;
