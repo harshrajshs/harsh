@@ -228,6 +228,11 @@
     position:absolute;inset:0;z-index:0;
     opacity:0.9;
   }
+  #heroParticles{
+    position:absolute;inset:0;z-index:0;
+    pointer-events:none;
+  }
+  #heroParticles canvas{display:block;}
   .hero::before{
     content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
     background-image:radial-gradient(var(--line) 1px, transparent 1px);
@@ -576,6 +581,7 @@
 </nav>
 
 <section class="hero">
+  <div id="heroParticles"></div>
   <div class="hero-bg" id="heroBg"></div>
   <div class="wrap hero-inner">
     <div>
@@ -1035,51 +1041,58 @@
       svg.style.display = 'block';
 
       const isMobile = W < 900; // matches the CSS layout breakpoint
-      const isTiny = W < 480;
 
       // Below the two-column breakpoint the portrait sits directly above the
-      // text (order:-1) with little vertical room — the orbiting node diagram
-      // has nowhere safe to go without colliding with the copy underneath, so
-      // we skip it entirely there and keep just the static dashed ring.
+      // text (order:-1) with little vertical room — skip the orbiting node
+      // diagram there and keep just the static dashed ring.
       if (isMobile){
         return;
       }
 
       const prect = portrait.getBoundingClientRect();
-      // Always anchor on the photo's real on-screen position, whatever the current layout is
       const cx = prect.left + prect.width / 2 - rect.left;
       const cy = prect.top + prect.height / 2 - rect.top;
       const portraitR = prect.width / 2;
 
-      // Orbit radius MUST clear the portrait itself (plus a gap for the node ring),
-      // not just the container edges — this is what previously let labels sit
-      // underneath the photo. We take the larger of "clears the photo" and
-      // "clears the container edge", then cap it so nothing runs off-screen.
-      const nodeR = isTiny ? 11 : 15;
-      const gap = isTiny ? 30 : (isMobile ? 42 : 56);
+      // The node ring must clear the portrait AND stay fully inside the
+      // hero's own box — including on the LEFT, where the copy column
+      // lives. We only ever place nodes in the right-hand hemisphere
+      // (angles from -78° to +78°, measured from straight up, sweeping
+      // through the right side), so nothing can drift left into the text.
+      const nodeR = 15;
+      const gap = 46;
       const desired = portraitR + gap + nodeR;
 
-      const marginX = isTiny ? 14 : (isMobile ? 20 : 40);
-      const marginRight = isTiny ? 46 : (isMobile ? 64 : 150); // extra room for label text
-      const marginTop = isTiny ? 34 : (isMobile ? 44 : 60);
-      const capRx = isMobile ? (isTiny ? 168 : 210) : 280;
-      const capRy = isMobile ? (isTiny ? 150 : 190) : 240;
+      const marginTop = 56;
+      const marginBottom = 56;
+      const marginRight = 118; // room for the label text past the node
+      const cap = 250;
 
-      // Never smaller than "clears the photo" (desired). Grow toward the
-      // available space when there's room, but never past the sensible cap.
-      const finalRx = Math.min(Math.max(desired, cx - marginX, W - cx - marginRight) , Math.max(desired, capRx));
-      const finalRy = Math.min(Math.max(desired, cy - marginTop, H - cy - marginTop), Math.max(desired, capRy));
+      // Available horizontal room from the portrait center to the right
+      // edge of the hero box. If there isn't enough room to clear the
+      // portrait plus its gap, the viewport is too narrow for this
+      // diagram to render cleanly — bail out to the plain dashed ring
+      // rather than clip labels against the edge.
+      const availableRight = W - cx - marginRight;
+      if (availableRight < desired){
+        return;
+      }
 
-      const labels = ['Delivery Risk','Capacity & Performance','Growth Opportunity','External Market Intel','Market Alignment'];
-      const shortLabels = ['Delivery Risk','Capacity','Growth','Market Intel','Alignment'];
+      const finalRx = Math.min(availableRight, cap);
+      const finalRy = Math.min(Math.max(desired, cy - marginTop, H - cy - marginBottom), cap);
+
+      const labels = ['Delivery Risk','Capacity & Performance','Growth Opportunity','Market Intelligence','Market Alignment'];
       const nodes = [];
-      for (let i = 0; i < 5; i++){
-        const ang = (-90 + i * 72) * Math.PI / 180;
+      const count = 5;
+      const spread = 156; // degrees of arc covered, centered on due-east (right)
+      for (let i = 0; i < count; i++){
+        const t = count === 1 ? 0.5 : i / (count - 1);
+        const ang = (-spread / 2 + t * spread) * Math.PI / 180; // measured from due-east
         nodes.push({
           x: cx + finalRx * Math.cos(ang),
           y: cy + finalRy * Math.sin(ang),
-          cosA: Math.cos(ang),
-          label: isMobile ? shortLabels[i] : labels[i]
+          side: Math.cos(ang) >= 0 ? 1 : 0,
+          label: labels[i]
         });
       }
 
@@ -1105,26 +1118,34 @@
         svg.appendChild(dash);
       });
 
-      // outer faint guide ellipse
-      svg.appendChild(el('ellipse', { cx, cy, rx: finalRx, ry: finalRy, fill: 'none', stroke: cLine, 'stroke-width': 1, 'stroke-dasharray': '2 6', opacity: 0.6 }));
+      // outer faint guide arc (right hemisphere only, matches node placement)
+      const arcStart = { x: cx + finalRx * Math.cos(-spread/2 * Math.PI/180), y: cy + finalRy * Math.sin(-spread/2 * Math.PI/180) };
+      const arcEnd = { x: cx + finalRx * Math.cos(spread/2 * Math.PI/180), y: cy + finalRy * Math.sin(spread/2 * Math.PI/180) };
+      svg.appendChild(el('path', {
+        d: `M${arcStart.x},${arcStart.y} A${finalRx},${finalRy} 0 0 1 ${arcEnd.x},${arcEnd.y}`,
+        fill: 'none', stroke: cLine, 'stroke-width': 1, 'stroke-dasharray': '2 6', opacity: 0.6
+      }));
 
-      // satellite nodes — label anchor & offset adapt to which side of the circle they're on,
-      // and sit behind a soft pill so they stay legible over either theme.
-      nodes.forEach(n => {
+      // satellite nodes — labels always sit to the right of their node and
+      // vertically offset by position along the arc, so none stack on the
+      // portrait or run past the hero's own right edge.
+      nodes.forEach((n, i) => {
         const g = el('g', {});
         const ring = el('circle', { cx: n.x, cy: n.y, r: nodeR, fill: cSurface, stroke: cAmber, 'stroke-width': 1.2, opacity: 0.95 });
         g.appendChild(ring);
         g.appendChild(el('circle', { cx: n.x, cy: n.y, r: 3, fill: cAmber }));
 
-        const fontSize = isTiny ? 9 : (isMobile ? 10 : 12);
-        const dy = n.y > cy ? (isTiny ? 20 : 26) : -(isTiny ? 14 : 18);
-        const ty = Math.min(Math.max(n.y + dy, fontSize + 2), H - 4);
-        const anchor = n.cosA > 0.3 ? 'start' : (n.cosA < -0.3 ? 'end' : 'middle');
-        const tx = anchor === 'start' ? Math.min(n.x + 4, W - 6) : (anchor === 'end' ? Math.max(n.x - 4, 6) : n.x);
+        const fontSize = 12;
+        const dy = n.y < cy ? -20 : (n.y > cy ? 24 : 4);
+        let ty = n.y + dy;
+        ty = Math.min(Math.max(ty, fontSize + 4), H - 6);
+        const tx = Math.min(n.x + nodeR + 10, W - 8);
+        const anchor = 'start';
 
-        const approxW = n.label.length * fontSize * 0.62;
-        const pillX = anchor === 'start' ? tx - 4 : (anchor === 'end' ? tx - approxW - 4 : tx - approxW / 2 - 4);
-        g.appendChild(el('rect', { x: pillX, y: ty - fontSize - 1, width: approxW + 8, height: fontSize + 8, rx: (fontSize + 8) / 2, fill: cBg, opacity: 0.72 }));
+        const approxW = n.label.length * fontSize * 0.6;
+        const maxTextW = Math.max(W - tx - 6, 40);
+        const clampedW = Math.min(approxW, maxTextW);
+        g.appendChild(el('rect', { x: tx - 4, y: ty - fontSize - 1, width: clampedW + 10, height: fontSize + 8, rx: (fontSize + 8) / 2, fill: cBg, opacity: 0.72 }));
 
         const text = el('text', { x: tx, y: ty, 'text-anchor': anchor, fill: cFaint, 'font-size': String(fontSize), 'font-family': 'IBM Plex Mono, monospace' });
         text.textContent = n.label;
@@ -1142,6 +1163,105 @@
     let resizeTimer;
     window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(render, 220); });
     window.addEventListener('themechange', render);
+  })();
+
+  // ---------- Hero particle field: quiet depth behind the network diagram ----------
+  (function heroParticles(){
+    const wrap = document.getElementById('heroParticles');
+    const heroEl = document.querySelector('.hero');
+    if (!wrap || !heroEl) return;
+
+    const canvas = document.createElement('canvas');
+    wrap.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+
+    let W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let particles = [];
+    let mouseX = 0.5, mouseY = 0.5, targetMX = 0.5, targetMY = 0.5;
+    let running = true;
+
+    function resize(){
+      const r = heroEl.getBoundingClientRect();
+      W = r.width; H = r.height;
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const density = Math.min(70, Math.max(30, Math.round((W * H) / 22000)));
+      particles = new Array(density).fill(0).map(() => ({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        z: 0.3 + Math.random() * 0.7, // depth: smaller = farther, drives parallax + size
+        r: 0.6 + Math.random() * 1.4,
+        vx: (Math.random() - 0.5) * 0.06,
+        vy: (Math.random() - 0.5) * 0.06
+      }));
+    }
+
+    function colors(){
+      const cs = getComputedStyle(document.documentElement);
+      return {
+        teal: cs.getPropertyValue('--teal').trim() || '#57e0c9',
+        line: cs.getPropertyValue('--line').trim() || '#24304a'
+      };
+    }
+    let c = colors();
+    window.addEventListener('themechange', () => { c = colors(); });
+
+    function frame(){
+      if (!running) return;
+      mouseX += (targetMX - mouseX) * 0.04;
+      mouseY += (targetMY - mouseY) * 0.04;
+      ctx.clearRect(0, 0, W, H);
+
+      const px = (mouseX - 0.5) * 24;
+      const py = (mouseY - 0.5) * 16;
+
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < -10) p.x = W + 10; if (p.x > W + 10) p.x = -10;
+        if (p.y < -10) p.y = H + 10; if (p.y > H + 10) p.y = -10;
+        const ox = p.x + px * p.z;
+        const oy = p.y + py * p.z;
+        ctx.beginPath();
+        ctx.arc(ox, oy, p.r * p.z, 0, Math.PI * 2);
+        ctx.fillStyle = c.teal;
+        ctx.globalAlpha = 0.12 + p.z * 0.22;
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(frame);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    if (window.matchMedia('(pointer: fine)').matches){
+      heroEl.addEventListener('mousemove', (e) => {
+        const r = heroEl.getBoundingClientRect();
+        targetMX = (e.clientX - r.left) / r.width;
+        targetMY = (e.clientY - r.top) / r.height;
+      });
+    }
+    document.addEventListener('visibilitychange', () => {
+      running = !document.hidden;
+      if (running) requestAnimationFrame(frame);
+    });
+
+    if (reduceMotion){
+      // Draw a single static, low-density frame and stop — no motion, no parallax.
+      running = false;
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * p.z, 0, Math.PI * 2);
+        ctx.fillStyle = c.teal;
+        ctx.globalAlpha = 0.12 + p.z * 0.22;
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    } else {
+      requestAnimationFrame(frame);
+    }
   })();
 </script>
 </body>
