@@ -4,17 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <script>
-  // Avoid a flash of the wrong theme: honor system preference before first paint.
-  // No storage APIs are used, so the choice only persists for this page view.
-  (function(){
-    try{
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches){
-        document.documentElement.setAttribute('data-theme','light');
-      } else {
-        document.documentElement.setAttribute('data-theme','dark');
-      }
-    }catch(e){}
-  })();
+  // Always default to dark, regardless of system preference.
+  // The toggle button still lets visitors switch to light for this page view.
+  document.documentElement.setAttribute('data-theme','dark');
 </script>
 <title>Harsh Raj — Data Scientist, Generative AI &amp; Azure Cloud</title>
 <meta name="description" content="Harsh Raj — Data Scientist building production Generative AI, multi-agent systems, and Azure cloud data platforms.">
